@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chouette Social</title>
+    <%= stylesheet_link_tag :all %>
+    <%= javascript_include_tag :defaults %>
+    <%= csrf_meta_tag %>
+
+    <!--using coca slider -->
+    <!-- Begin JavaScript -->
+    <script type="text/javascript" src="javascripts/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="javascripts/jquery.easing.1.3.js"></script>
+    <script type="text/javascript" src="javascripts/jquery.coda-slider-2.0.js"></script>
+    <script type="text/javascript">
+      $().ready(function() {
+        $('#coda-slider-1').codaSlider();
+      });
+    </script>
+    <!-- End JavaScript -->
+
+  </head>
+  <body>
+
+    <!-- use your personal wallpaper -->
+    <% unless current_user.nil? || current_user.wallpaper.nil? || current_user.wallpaper.empty? %>
+      <style>
+        body
+        {
+          background-image:url('<%=current_user.wallpaper%>');
+        }
+      </style>
+    <%end%>
+
+  <section id="head">
+
+    <section id="user">
+      <% if user_signed_in? %>
+        <nav id="nav_user">
+          <ul>
+            <span><%= current_user.email %></span>
+            <li><%= link_to "Manage Accounts + WallPaper", services_path %></li>
+            <li><%= link_to "Sign out", signout_services_path %></li>
+          </ul>
+        </nav>
+      <% else %>
+        <nav id="nav_user">
+          <ul>
+            <span>Sign in with:</span>
+            <!--<li><%= link_to "Chatter", "/auth/salesforce" %></li>-->
+            <li><%= link_to "Chatter", "/auth/forcedotcom" %></li>
+            <li><%= link_to "Facebook", "/auth/facebook" %></li>
+            <li><%= link_to "LinkedIn", "/auth/linked_in" %></li>
+            <li><%= link_to "Twitter", "/auth/twitter" %></li>
+          </ul>
+        </nav>
+      <% end %>
+    </section>
+    <% if current_user %>
+      <h1>
+        <%= link_to image_tag("chouette.jpg", {:title => "Chouette Social" }), root_path %>
+        <%= link_to" Chouette Social", root_path, :id=>"my_head" %>
+      </h1>
+
+    <%  else%>
+      <h1>
+        <%= link_to image_tag("chouette.jpg", {:title => "Chouette Social" }), signin_services_path %>
+        <%= link_to " Chouette Social", signin_services_path%>
+      </h1>
+    <%end%>
+  </section>
+
+  <section id="body">
+    <section id="flash">
+      <% flash.each do |key, value| %>
+        <div class="flash <%= key %> round"><%= value %></div>
+      <% end %>
+    </section>
+
+    <%= yield %>
+  </section>
+
+  <%= render 'layouts/footer'%>
+</body>
+</html>

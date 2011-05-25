@@ -1,0 +1,204 @@
+<% if !current_user %>
+<h6 style="color: oldlace"><font style="color: crimson">Chouette-Social</font> is a Social Networking Feed Aggregator tool. You can get all your favorite newsfeeds in one place, e.g. Chatter, Facebook, Twitter, LinkedIn, ....</h6>
+Source code will be available on <a href="http://github.com/raygao>"Github</a> shortly under the Creative Common license.
+  <br/>
+  <h2 style="color: chartreuse">First, please Authenticate yourself --> <%= link_to "click here", signin_services_path %></h2>
+<% else %>
+  <div style="width:850px;">
+    <h2>Welcome <%=current_user.name%>!</h2>
+    <%= form_tag(add_new_feedposts_path, :method => "post") do %>
+      <div class="alignCenter">
+        <div class="feedpost_box">
+          <%= label_tag :feed_update, "Feel free to say something:" %>
+          <%= text_area_tag :feed_update, '', {:size => "80x3", :maxlength=>"140"} %>
+        </div>
+        <br/>
+
+        <% for service in @my_services %>
+          <%  if service.provider =='forcedotcom' %>
+            <!-- using chatter for forcedotcom name -->
+            <%= check_box_tag(service.provider) %>
+            <%= label_tag(service.provider, "Chatter") %>
+          <%else%>
+            <%= check_box_tag(service.provider) %>
+            <%= label_tag(service.provider, service.provider.camelize) %>
+          <%end%>
+        <%end %>
+        <br/>
+        <br/>
+        <%= image_submit_tag("post_button.gif")%>
+      </div>
+    <% end %>
+  </div>
+
+  <hr/>
+
+
+  <div class="coda-slider-wrapper" >
+    <div class="coda-slider preload" id="coda-slider-1">
+
+      <div class="panel">
+        <div id="fb_feeds" class="panel-wrapper">
+          <h2 class="title">Facebook</h2>
+          <p>
+            <% unless @fb_feeds.nil? || @fb_feeds.empty? %>
+            <table CELLSPACING=10 cellpadding="10">
+              <tr>
+                <th>ID</th>
+                <th>Message:</th>
+                <th>Posted by:</th>
+                <th>Created at:</th>
+              </tr>
+              <% i= 0 %>
+              <% for fb_feed in @fb_feeds %>
+                <tr>
+                  <%begin%>
+                    <td><%= i=i+1 %></td>
+                    <td>
+                      <%unless fb_feed.message.nil? ||fb_feed.message.empty?%>
+                        <% fmessage = auto_link(fb_feed.message) %>
+                        <%= raw fmessage %>
+                      <%end%>
+                    </td>
+                    <td align="center">
+                      <a href="http://www.facebook.com/profile.php?id=<%= fb_feed.from.identifier%>">
+                        <img src="http://graph.facebook.com/<%= fb_feed.from.identifier%>/picture" />
+                        <br/>
+                        <%= fb_feed.from.name %>
+                      </a>
+                    </td>
+                    <td><%= fb_feed.updated_time %> </td>
+                  <%rescue Exception => e%>
+                    <td colspan="4"> <%= e.message %></td>
+                  <%end%>
+                </tr>
+              <%  end %>
+            </table>
+          <%end%>
+          </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div id="linkedins" class="panel-wrapper">
+          <h2 class="title">LinkedIn</h2>
+          <p>
+            <% unless @linked_in_feeds.nil? || @linked_in_feeds.empty? %>
+            <table CELLSPACING=10 cellpadding="10">
+              <tr>
+                <th>ID</th>
+                <th>Message:</th>
+                <th>Posted by:</th>
+                <th>Created at:</th>
+              </tr>
+              <% i= 0 %>
+              <% for lk_feed in @linked_in_feeds %>
+                <tr>
+                  <%begin%>
+                    <td><%= i=i+1 %></td>
+                    <td>
+                      <% lmessage = auto_link(lk_feed['update-content'][0]['person'][0]['current-status'][0].to_s) %>
+                      <%= raw lmessage%>
+                    </td>
+                    <td>
+                      <a href ="<%= raw lk_feed['update-content'][0]['person'][0]['site-standard-profile-request'][0]['url'][0]%>">
+                        <img src="<%= raw lk_feed['update-content'][0]['person'][0]['picture-url'][0]%>"/>
+                        <br/>
+                        <%= lk_feed['update-content'][0]['person'][0]['first-name'][0]%> <%= lk_feed['update-content'][0]['person'][0]['last-name'][0]%>
+                      </a>
+                    </td>
+                    <td><%= Time.parse(lk_feed['timestamp'][0])%></td>
+                  <%rescue Exception => e%>
+                    <td colspan="2"> <%= e.message %></td>
+                  <%end%>
+                </tr>
+              <%  end %>
+            </table>
+          <%end%>
+          </p>
+        </div>
+      </div>
+
+
+      <div class="panel">
+        <div id="tweets" class="panel-wrapper">
+          <h2 class="title">Tweets</h2>
+          <p>
+            <% unless @twitter_feeds.nil? || @twitter_feeds.empty? %>
+            <table CELLSPACING=10 cellpadding="10">
+              <tr>
+                <th>ID</th>
+                <th>Message:</th>
+                <th>Posted by:</th>
+                <th>Created at:</th>
+              </tr>
+              <% i= 0 %>
+              <% for tw_feed in @twitter_feeds %>
+                <tr>
+                  <%begin%>
+                    <td><%= i=i+1 %></td>                    
+                    <td>
+                      <% message = auto_link(tw_feed.text.to_s) %>
+                      <%= raw parse_twitter(message)  %>
+                    </td>
+                    <td align="center">
+                      <% url_to_profile = "http://twitter.com/#!/" + tw_feed.user.screen_name.to_s%>
+                      <a href="<%= raw url_to_profile%>">
+                        <img src="<%= tw_feed.user.profile_image_url.to_s%>"/>
+                        <br/>
+                        <%= tw_feed.user.name%>
+                      </a>
+                    </td>
+                    <td><%= tw_feed.created_at.to_s%></td>
+                  <% rescue Exception => e %>
+                    <td colspan="2"> <%= e.message %></td>
+                  <%end%>
+                </tr>
+              <%  end %>
+            </table>
+          <%end%>
+          </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-wrapper" id="chatters">
+          <h2 class="title">Chatter</h2>
+          <p>
+            <% unless @chatter_feeds.nil? || @chatter_feeds.empty? %>
+            <table CELLSPACING=10 cellpadding="10">
+              <tr>
+                <th>ID</th>
+                <th>Message:</th>
+                <th>Posted by:</th>
+                <th>Created at:</th>
+              </tr>
+              <% i= 0 %>
+              <% for chatter in @chatter_feeds %>
+                <tr>
+                  <%begin%>
+                    <td><%= i=i+1 %></td>                    
+                    <td>
+                      <% cmessage = auto_link(chatter['FeedPost']['Body'])%>
+                      <%= raw cmessage%>
+                    </td>
+                    <td align="center">
+                      <a href="<%= @rest_svr + "/" + chatter['CreatedBy']['Id']%>"><%= chatter['CreatedBy']['Name']%></a>
+                    </td>
+                    <td><%= chatter['CreatedDate']%></td>
+                  </tr>
+                <%rescue Exception => e%>
+                  <td colspan="4"> <%= e.message %></td>
+                <%end%>
+              <%  end %>
+            </table>
+          <%end%>
+          </p>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+<%end%>

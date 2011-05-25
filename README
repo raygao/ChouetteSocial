@@ -1,0 +1,14 @@
+This is my submission for the Ruby Social Networking Status Update Contest.
+
+For detail, see ChouetteSocial_documentation.pdf file for use case and setup instruction.
+
+This is release as open-source (Apache 2.0) and under Creative Commons License.
+
+The author: Raymond Gao (Are4Us Technologies) does not offer any guarantee, direct or indirect in anyways or means, and cannot be held liable for damages or misuses.
+
+Copyright: 2011, http://are4.us ©
+
+Additional Credit goes:
+OmniAuth Pure Example: http://www.communityguides.eu/articles/16
+Omniauth: http://github.com/intridea/omniauth
+Omniauth Buttons: http://github.com/intridea/authbuttons
