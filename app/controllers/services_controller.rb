@@ -128,11 +128,15 @@ class ServicesController < ApplicationController
         # request.env['omniauth.strategy'].instance_variable_get(:@access_token).instance_variable_get(:@refresh_token)
         # Furthermore, due to time-out, Force.com's token is session based and does not last forever.
         # You need to use refresh_token to regenerate the access_token
+        # @authhash[:token_refresh] = request.env['omniauth.strategy'].instance_variable_get(:@access_token).instance_variable_get(:@refresh_token)
+        # @authhash[:sf_consumer_key] = request.env['omniauth.strategy'].instance_variable_get(:@access_token).client.id
+        # @authhash[:sf_consumer_secret] = request.env['omniauth.strategy'].instance_variable_get(:@access_token).client.secret
+
         @authhash[:token] = omniauth['credentials']['token']
-        @authhash[:token_secret] = ''
-        @authhash[:token_refresh] = request.env['omniauth.strategy'].instance_variable_get(:@access_token).instance_variable_get(:@refresh_token)
-        @authhash[:sf_consumer_key] = request.env['omniauth.strategy'].instance_variable_get(:@access_token).client.id
-        @authhash[:sf_consumer_secret] = request.env['omniauth.strategy'].instance_variable_get(:@access_token).client.secret
+        @authhash[:token_secret] = '' #Not used only for LinkedIn / Twitter
+        @authhash[:token_refresh] = omniauth['credentials']['refresh_token']
+        @authhash[:sf_consumer_key] = omniauth['credentials']['consumer_key']
+        @authhash[:sf_consumer_secret] = omniauth['credentials']['consumer_secret']
       elsif service_route == 'twitter'
         omniauth['user_info']['email'] ? @authhash[:email] =  omniauth['user_info']['email'] : @authhash[:email] = ''
         omniauth['user_info']['name'] ? @authhash[:name] =  omniauth['user_info']['name'] : @authhash[:name] = ''

@@ -14,7 +14,8 @@ module OmniAuth
           :access_token_path => '/services/oauth2/token'
         }
 
-        options.merge!(:response_type => 'code', :grant_type => 'authorization_code')
+        # 'code' locks you into one site; 'token' works across sites.
+        options.merge!(:response_type => 'token', :grant_type => 'authorization_code')
 
         super(app, :forcedotcom, consumer_key, consumer_secret, client_options, options, &block)
       end
@@ -24,7 +25,11 @@ module OmniAuth
         OmniAuth::Utils.deep_merge(super, {
             'uid' => @access_token['id'],
             'credentials' => {
-              'instance_url' => @access_token['instance_url']
+              "instance_url" => @access_token['instance_url'],
+              "refresh_token" => @access_token.refresh_token,
+              "consumer_key" => @access_token.client.id,
+              "consumer_secret" => @access_token.client.secret
+
             },
             'extra' => {'user_hash' => data},
             'user_info' => {
@@ -33,6 +38,7 @@ module OmniAuth
             }
           })
       end
+
 
       def user_data
         @data ||= MultiJson.decode(@access_token.get(@access_token['id']))
